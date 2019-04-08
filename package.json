@@ -1,0 +1,21 @@
+{
+  "name": "technicalanna-server",
+  "version": "1.0.0",
+  "description": "Node server for Technical Anna client",
+  "main": "index.js",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@bitbucket.org/akxclan/technicalanna-server.git"
+  },
+  "author": "Akash Giri",
+  "license": "ISC",
+  "homepage": "https://bitbucket.org/akxclan/technicalanna-server#readme"
+}
