@@ -1,8 +1,10 @@
 var bodyParser = require('body-parser');
 var md5 = require('md5');
 var urlencodedParser = bodyParser.urlencoded({ extended: false });
-var nodemailer = require('nodemailer');
+const sgMail = require('@sendgrid/mail');
 var constants = require('../../utils/constants');
+
+sgMail.setApiKey('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');
 
 
 module.exports = function (app, db) {
@@ -19,8 +21,8 @@ module.exports = function (app, db) {
                         if (req.body.type === 'social') {
                             ref.update({
                                 'user_id': uid,
-                                'isPhoneVerified': false,
-                                'isEmailVerified': false,
+                                'isPhoneVerified': true,
+                                'isEmailVerified': true,
                                 'social': req.body.social,
                                 'name': req.body.name,
                                 'email': req.body.email,
@@ -34,7 +36,7 @@ module.exports = function (app, db) {
                                 })
                                 .catch(err => {
                                     console.log('Error in adding user : ' + err)
-                                    res.status(410).send({ 'error': err });
+                                    res.status(410).send({ 'error': err ,'pos':1});
                                     return err
                                 });
                         }
@@ -51,7 +53,7 @@ module.exports = function (app, db) {
             })
             .catch(err => {
                 console.log('Error in adding user : ' + err)
-                res.status(410).send({ 'error': err });
+                res.status(410).send({ 'error': err ,'pos':2});
                 return err
             });
     });
@@ -64,8 +66,7 @@ module.exports = function (app, db) {
                     ref.update({
                         'name': req.body.name,
                         'phone': req.body.phone,
-                        'image': req.body.image,
-                        'password': req.body.password
+                        'image': req.body.image
                     })
                         .then((doc) => {
                             res.send({ 'res': 'Profile updated successfully' })
@@ -169,7 +170,7 @@ module.exports = function (app, db) {
     });
 
     app.post('/v1/profile/getAllUsers', urlencodedParser, function (req, res) {
-        var ref = db.collection('users').get()
+        var ref = db.collection('users')
         ref.get()
             .then((snapShot) => {
                 if (snapShot.empty) {
@@ -227,30 +228,45 @@ module.exports = function (app, db) {
 
 
     app.post('/v1/profile/triggerOtpEmail', urlencodedParser, function (req, res) {
-        console.log('constant',constants.gmail_user,constants.gmail_passwor)
-        var transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-              user: 'ncpminds@gmail.com',
-              pass: 'ncp@8600068568'
-            }
-          });
-          
-          var mailOptions = {
-            from: constants.gmail_user,
+        
+        const msg = {
             to: req.body.email,
-            subject: 'Technical Anna Verification code',
-            text: 'Your verification code to verify email address and sign in to Technical Anna is ${req.body.otp}.\nPlease do not share this email.'
-          };
-          
-          transporter.sendMail(mailOptions, function(error, info){
-            if (error) {
-              console.log(error);
-              res.status(410).send({'error':error})
-            } else {
-              console.log('Email sent: ' + info.response);
-              res.send({'res':'Email sent to ${req.body.email}', 'info':info.response})
-            }
-          });
+            from: 'ncpminds@gmail.com',
+            subject: 'OTP Verification for Technical Anna',
+            text: 'Hi,\nOTP code for email verification is '+req.body.otp,
+        };
+        sgMail.send(msg);
+        res.send({'res':'Email sent'});
+    });
+
+    app.post('/v1/profile/login', urlencodedParser, function (req, res) {
+        var ref = db.collection('users').doc(req.body.email)
+        ref.get()
+            .then(oldUser => {
+                if (oldUser.exists) {
+                    if(oldUser.data().password === "")
+                    {
+                        res.send({'res':'Your last login is with '+ oldUser.data().social +' account. Please login with same and update password to use email password.', 'user':oldUser.data()})
+                    }
+                    else
+                    if(oldUser.data().password === req.body.password)
+                    {
+                        res.send({'res':'success', 'user':oldUser.data()})
+                    }
+                    else
+                    {
+                        res.status(410).send({ 'res': 'Password is incorrect' });
+                    }
+                }
+                else {
+                    res.status(410).send({ 'res': 'This is not registered email id' });
+                }
+                return oldUser
+            })
+            .catch(err => {
+                console.log('User not found : ' + err)
+                res.status(410).send({ 'error': err });
+                return err
+            });
     });
 };
