@@ -20,6 +20,18 @@
       {
         "source": "/v1/profile",
         "destination": "profileApp"
+      },
+      {
+        "source": "/v1/booster",
+        "destination": "boosterApp"
+      },
+      {
+        "source": "/v1/subjectexams",
+        "destination": "subjectExamsApp"
+      },
+      {
+        "source": "/v1/fulllengthexams",
+        "destination": "fullLengthExamsApp"
       }
     ]
   }

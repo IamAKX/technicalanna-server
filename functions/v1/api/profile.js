@@ -28,6 +28,7 @@ module.exports = function (app, db) {
                                 'email': req.body.email,
                                 'phone': req.body.phone,
                                 'image': req.body.image,
+                                'type': req.body.type,
                                 'password': req.body.password
                             })
                                 .then((doc) => {
@@ -170,33 +171,20 @@ module.exports = function (app, db) {
     });
 
     app.post('/v1/profile/getAllUsers', urlencodedParser, function (req, res) {
-        var ref = db.collection('users')
-        ref.get()
-            .then((snapShot) => {
-                if (snapShot.empty) {
-                    res.send({ 'users': {} })
-                }
-                else {
-                    var userList = {}
-                    ref.get()
-                        .then(querySnapshot => {
-                            querySnapshot.docs.forEach(doc => {
-                                userList.push(doc.data());
-                            })
-                        return querySnapshot
-                    })
-                    .catch(err =>{
-                        console.log('User not found : ' + err)
-                        res.status(410).send({ 'error': err });
-                        return err
-                    })
-                    res.send({ 'users': userList })
-                }
-                return snapShot
+        db.collection('users').get()
+            .then((snapshot) => {
+                var prod = { users : [] }
+                snapshot.forEach((doc) => {
+                    var p = doc.data()
+                    p["id"] = doc.id
+                    prod.users.push(p);
+                });
+                res.send(prod);
+                return doc
             })
-            .catch(err => {
-                console.log('User not found : ' + err)
-                res.status(410).send({ 'error': err });
+            .catch((err) => {
+                console.log('Error getting documents', err);
+                res.status(410).send({"res" : 'Error getting users'})
                 return err
             });
     });
@@ -265,6 +253,36 @@ module.exports = function (app, db) {
             })
             .catch(err => {
                 console.log('User not found : ' + err)
+                res.status(410).send({ 'error': err });
+                return err
+            });
+    });
+
+    app.post('/v1/profile/updatePassword', urlencodedParser, function (req, res) {
+        var ref = db.collection('users').doc(req.body.email)
+        ref.get()
+            .then(oldUser => {
+                if (oldUser.exists) {
+                    ref.update({
+                        'password': req.body.password
+                    })
+                        .then((doc) => {
+                            res.send({ 'res': 'Password is updated successfully' })
+                            return doc
+                        })
+                        .catch(err => {
+                            console.log('Error in updating password : ' + err)
+                            res.status(410).send({ 'error': err });
+                            return err
+                        });
+                }
+                else {
+                    res.status(410).send({ 'res': 'User does not exits' });
+                }
+                return oldUser
+            })
+            .catch(err => {
+                console.log('Error in updating user : ' + err)
                 res.status(410).send({ 'error': err });
                 return err
             });
