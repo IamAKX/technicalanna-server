@@ -32,6 +32,10 @@
       {
         "source": "/v1/fulllengthexams",
         "destination": "fullLengthExamsApp"
+      },
+      {
+        "source": "/v1/wallet",
+        "destination": "walletApp"
       }
     ]
   }

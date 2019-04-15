@@ -6,6 +6,8 @@ var profile = require('./v1/api/profile')
 var booster = require('./v1/api/booster')
 var subjectexams = require('./v1/api/subjectexams')
 var fulllengthexams = require('./v1/api/fulllengthexams')
+var wallet = require('./v1/api/wallet')
+
 
 admin.initializeApp(functions.config().firebase);
 var db = admin.firestore();
@@ -27,8 +29,12 @@ subjectexams(subjectExamsApp,db)
 const fullLengthExamsApp = express()
 fulllengthexams(fullLengthExamsApp,db)
 
+const walletApp = express()
+wallet(walletApp,db)
+
 exports.app = functions.https.onRequest(app);
 exports.profileApp = functions.https.onRequest(profileApp);
 exports.boosterApp = functions.https.onRequest(boosterApp);
 exports.subjectExamsApp = functions.https.onRequest(subjectExamsApp);
 exports.fullLengthExamsApp = functions.https.onRequest(fullLengthExamsApp);
+exports.walletApp = functions.https.onRequest(walletApp);

@@ -37,6 +37,10 @@ module.exports = function (app, db) {
             });
     });
 
+    
+
+
+
     app.post('/v1/fullexam/addSyllabus', urlencodedParser, function (req, res) {
         var ref = db.collection(req.body.subject).doc(req.body.name)
         ref.set(
@@ -98,6 +102,19 @@ module.exports = function (app, db) {
         });    
     });
 
+    app.post('/v1/fullexam/fetchDataByName', urlencodedParser, function (req, res) {
+        var ref = db.collection(req.body.subject).doc(req.body.name)
+        ref.get()
+        .then(qpr => {
+            res.send({"res":qpr.data()});
+            return qpr
+        })
+        .catch(err => {
+            console.log('Failed to fetch')
+            res.status(410).send({ "res": "Failed to fetch" })
+            return err
+        });    
+    });
 
 
     // -------------  Exams Operations  ----------------
