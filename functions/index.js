@@ -32,9 +32,9 @@ fulllengthexams(fullLengthExamsApp,db)
 const walletApp = express()
 wallet(walletApp,db)
 
-// exports.app = functions.https.onRequest(app);
-// exports.profileApp = functions.https.onRequest(profileApp);
-// exports.boosterApp = functions.https.onRequest(boosterApp);
-// exports.subjectExamsApp = functions.https.onRequest(subjectExamsApp);
-// exports.fullLengthExamsApp = functions.https.onRequest(fullLengthExamsApp);
-// exports.walletApp = functions.https.onRequest(walletApp);
+exports.app = functions.https.onRequest(app);
+exports.profileApp = functions.https.onRequest(profileApp);
+exports.boosterApp = functions.https.onRequest(boosterApp);
+exports.subjectExamsApp = functions.https.onRequest(subjectExamsApp);
+exports.fullLengthExamsApp = functions.https.onRequest(fullLengthExamsApp);
+exports.walletApp = functions.https.onRequest(walletApp);
