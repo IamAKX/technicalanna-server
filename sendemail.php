@@ -13,11 +13,15 @@ if (!$val) {
     $res->success = $errorMessage;
     $myJSON = json_encode($res);
     echo $myJSON;
+    $log = date("M,d,Y h:i:s A")."\tFailed to send mail to ".$email." - Error : ".$errorMessage."\n";
+    file_put_contents('./log_'.date("j.n.Y").'.log', $log, FILE_APPEND);
 }
 else{
 $res = new \stdClass();
 $res->success = $val;
 $myJSON = json_encode($res);
 echo $myJSON;
+$log = date("M,d,Y h:i:s A")."\tMail sent to ".$email."\n";
+file_put_contents('./log_'.date("j.n.Y").'.log', $log, FILE_APPEND);
 }
 ?>
